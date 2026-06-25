@@ -37,7 +37,9 @@ import logging
 import logging.config
 import os
 import pymongo
+from pymongo.server_api import ServerApi
 import sentry_sdk
+import time
 
 
 define("appprefix", default="", help="DB name prefix")
@@ -75,9 +77,12 @@ if __name__ == "__main__":
     mongodb = None
     while not mongodb:
         try:
-            mongodb = pymongo.MongoClient(options.mongouri)
-        except:
-            logging.error("Cannot not connect to MongoDB")
+            client = pymongo.MongoClient(options.mongouri, server_api=ServerApi("1"))
+            client.admin.command("ping")
+            mongodb = client
+        except Exception as ex:
+            logging.error("Cannot not connect to MongoDB: %s" % ex)
+            time.sleep(5)
 
     masterdb = mongodb[options.masterdb]
     services = init_messaging_agents(masterdb)
