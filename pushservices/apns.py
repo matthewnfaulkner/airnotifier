@@ -86,7 +86,7 @@ class ApnsClient(PushService):
         }
         # data structure:
         # https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html#//apple_ref/doc/uid/TP40008194-CH17-SW1
-        payload_data = {"aps": {"alert": alert, **filtered_apns}}
+        payload_data = {"aps": {"alert": alert, **filtered_apns}, **apns}
         self.payload = json_encode(payload_data)
 
         PATH = "/3/device/{0}".format(token)

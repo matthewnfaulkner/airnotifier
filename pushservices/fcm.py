@@ -69,14 +69,9 @@ class FCMClient(PushService):
         # https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
         payload = {"message": {"token": token}}
 
-        if alert:
-            payload["message"]["notification"] = self.format_values(alert)
-
         if data:
-            payload["message"]["data"] = self.format_values(data)
-
-        if android:
-            payload["message"]["android"] = android
+            datapayload = self.format_values(data)
+            payload["message"]["android"] = {"data": datapayload, "priority": "high"}
 
         if webpush:
             payload["message"]["webpush"] = webpush

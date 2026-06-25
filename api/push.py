@@ -110,7 +110,7 @@ class PushHandler(APIBaseHandler):
 
             logging.info("sending notification to %s: %s" % (device, self.token))
             #  if device in [DEVICE_TYPE_FCM, DEVICE_TYPE_ANDROID]:
-            if device.endswith(DEVICE_TYPE_FCM):
+            if device.endswith(DEVICE_TYPE_FCM) or device == DEVICE_TYPE_ANDROID:
                 fcm = request_dict.get("fcm", {})
                 try:
                     fcmconn = self.fcmconnections[self.app["shortname"]][0]
@@ -135,15 +135,17 @@ class PushHandler(APIBaseHandler):
                     alert = "".join(alert.splitlines())
 
                 # https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html#//apple_ref/doc/uid/TP40008194-CH17-SW1
-                apns_default = {"badge": None, "sound": "default", "push_type": "alert"}
+                apns_default = {"badge": 0, "sound": "default", "push_type": "alert"}
                 apnspayload = request_dict.get("apns", {})
+                datapayload = request_dict.get("fcm", {}).get("data", {})
+
                 conn = self.get_apns_conn()
                 if conn:
                     try:
                         conn.process(
                             token=self.token,
                             alert=alert,
-                            apns={**apns_default, **apnspayload},
+                            apns={**apns_default, **apnspayload, **datapayload},
                         )
                     except Exception as ex:
                         logging.error(ex)
