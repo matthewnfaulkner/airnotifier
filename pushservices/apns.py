@@ -47,7 +47,7 @@ class ApnsClient(PushService):
                 headers={"alg": ALGORITHM, "kid": self.key_id},
             )
             self.last_token_refresh = now
-            self.token = token.decode("ascii")
+            self.token = token
         return self.token
 
     def build_headers(self, push_type="alert"):
