@@ -19,6 +19,16 @@ def process_pushnotification_payload(data):
     if not title:
         title = "Notification"
 
+    # The Moodle app expects "notif" and "moodlecomponent", but this payload
+    # uses the legacy Moodle airnotifier field names "notification" and
+    # "component". Without the renamed keys, the app's messages push handler
+    # mistakes regular notifications (e.g. forum posts) for personal messages
+    # and opens a conversation with the notification's userfromid instead.
+    if "notif" not in extra and "notification" in extra:
+        extra["notif"] = extra["notification"]
+    if "moodlecomponent" not in extra and "component" in extra:
+        extra["moodlecomponent"] = extra["component"]
+
     if "alert" not in data:
         data["alert"] = {"body": message, "title": title}
 
